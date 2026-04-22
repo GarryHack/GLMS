@@ -1,0 +1,59 @@
+@model GLMS.Web.Models.Contract
+@using GLMS.Web.Models
+@{
+    ViewData["Title"] = "Delete Contract";
+
+    var badgeClass = Model.Status switch
+    {
+        ContractStatus.Active  => "badge bg-success",
+        ContractStatus.Expired => "badge bg-danger",
+        ContractStatus.OnHold  => "badge bg-warning text-dark",
+        _                      => "badge bg-secondary"
+    };
+}
+
+<h2 class="mb-4 text-danger">Delete Contract</h2>
+
+<div class="alert alert-warning">
+    <strong>Warning:</strong> Deleting this contract will also delete all
+    <strong>@Model.ServiceRequests.Count</strong> linked service request(s). This cannot be undone.
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white fw-semibold">Contract to be deleted</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Client</dt>
+                    <dd class="col-sm-7">@Model.Client.Name</dd>
+
+                    <dt class="col-sm-5">Service Level</dt>
+                    <dd class="col-sm-7">@Model.ServiceLevel</dd>
+
+                    <dt class="col-sm-5">Start Date</dt>
+                    <dd class="col-sm-7">@Model.StartDate.ToString("yyyy-MM-dd")</dd>
+
+                    <dt class="col-sm-5">End Date</dt>
+                    <dd class="col-sm-7">@Model.EndDate.ToString("yyyy-MM-dd")</dd>
+
+                    <dt class="col-sm-5">Status</dt>
+                    <dd class="col-sm-7"><span class="@badgeClass">@Model.Status</span></dd>
+
+                    <dt class="col-sm-5">Service Requests</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-secondary">@Model.ServiceRequests.Count</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input asp-for="Id" type="hidden" />
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger">Yes, Delete Contract</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>

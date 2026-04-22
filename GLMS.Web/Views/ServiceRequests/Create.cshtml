@@ -1,0 +1,89 @@
+@model GLMS.Web.Models.ServiceRequest
+@using GLMS.Web.Models
+@{
+    ViewData["Title"] = "New Service Request";
+}
+
+<h2 class="mb-4">New Service Request</h2>
+
+<div class="row">
+    <div class="col-md-7">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="ContractId" class="form-label fw-semibold">Contract</label>
+                <select asp-for="ContractId" asp-items="ViewBag.Contracts" class="form-select">
+                    <option value="">-- Select an Active Contract --</option>
+                </select>
+                <span asp-validation-for="ContractId" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label fw-semibold"></label>
+                <textarea asp-for="Description" class="form-control" rows="4"
+                          placeholder="Describe the service request in detail..."></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CostUSD" class="form-label fw-semibold">Cost (USD)</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input asp-for="CostUSD" type="number" step="0.01" min="0"
+                           class="form-control" id="costUsdInput" placeholder="0.00" />
+                </div>
+                <span asp-validation-for="CostUSD" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Cost (ZAR) <span class="badge bg-info text-dark ms-1">Auto-calculated</span></label>
+                <div class="input-group">
+                    <span class="input-group-text">R</span>
+                    <input type="text" id="costZarDisplay" class="form-control bg-light"
+                           readonly placeholder="0.00" />
+                </div>
+                <div class="form-text">
+                    Live rate: <strong id="rateDisplay"></strong> ZAR per USD
+                    <span class="text-muted">(falls back to 18.50 if API unavailable)</span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Status" class="form-label fw-semibold"></label>
+                <select asp-for="Status"
+                        asp-items="Html.GetEnumSelectList<ServiceRequestStatus>()"
+                        class="form-select"></select>
+                <span asp-validation-for="Status" class="text-danger small"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Save Request</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            const zarRate = @(((decimal)ViewBag.ZarRate).ToString("F6", System.Globalization.CultureInfo.InvariantCulture));
+            const usdInput = document.getElementById('costUsdInput');
+            const zarDisplay = document.getElementById('costZarDisplay');
+            const rateDisplay = document.getElementById('rateDisplay');
+
+            rateDisplay.textContent = zarRate.toFixed(4);
+
+            function recalculate() {
+                const usd = parseFloat(usdInput.value) || 0;
+                zarDisplay.value = (usd * zarRate).toFixed(2);
+            }
+
+            usdInput.addEventListener('input', recalculate);
+            recalculate();
+        })();
+    </script>
+}

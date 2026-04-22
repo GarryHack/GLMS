@@ -1,0 +1,61 @@
+@model IEnumerable<GLMS.Web.Models.ServiceRequest>
+@using GLMS.Web.Models
+@{
+    ViewData["Title"] = "Service Requests";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Service Requests</h2>
+    <a asp-action="Create" class="btn btn-primary">+ New Request</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No service requests found. Create one against an active contract.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Contract / Client</th>
+                    <th>Description</th>
+                    <th class="text-end">Cost (USD)</th>
+                    <th class="text-end">Cost (ZAR)</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var request in Model)
+                {
+                    var statusClass = request.Status switch
+                    {
+                        ServiceRequestStatus.Pending    => "badge bg-secondary",
+                        ServiceRequestStatus.InProgress => "badge bg-primary",
+                        ServiceRequestStatus.Completed  => "badge bg-success",
+                        ServiceRequestStatus.Cancelled  => "badge bg-danger",
+                        _                               => "badge bg-secondary"
+                    };
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">@request.Contract.Client.Name</div>
+                            <div class="text-muted small">@request.Contract.ServiceLevel</div>
+                        </td>
+                        <td>@request.Description</td>
+                        <td class="text-end">$@request.CostUSD.ToString("N2")</td>
+                        <td class="text-end">R @request.CostZAR.ToString("N2")</td>
+                        <td><span class="@statusClass">@request.Status</span></td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@request.Id"
+                               class="btn btn-sm btn-outline-secondary">Details</a>
+                            <a asp-action="Delete" asp-route-id="@request.Id"
+                               class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

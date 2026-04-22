@@ -1,0 +1,34 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+nuget.config.local
+
+# Test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Logs
+*.log
+logs/
+
+# User secrets
+secrets.json
+
+# Uploaded files — keep the folder, ignore its contents
+GLMS.Web/wwwroot/uploads/*
+!GLMS.Web/wwwroot/uploads/.gitkeep

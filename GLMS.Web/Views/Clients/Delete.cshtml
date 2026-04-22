@@ -1,0 +1,44 @@
+@model GLMS.Web.Models.Client
+@{
+    ViewData["Title"] = "Delete Client";
+}
+
+<h2 class="mb-4 text-danger">Delete Client</h2>
+
+<div class="alert alert-warning">
+    <strong>Warning:</strong> Deleting this client will also delete all of their contracts and service requests.
+    This action cannot be undone.
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white fw-semibold">Client to be deleted</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Name</dt>
+                    <dd class="col-sm-8">@Model.Name</dd>
+
+                    <dt class="col-sm-4">Contact</dt>
+                    <dd class="col-sm-8">@Model.ContactDetails</dd>
+
+                    <dt class="col-sm-4">Region</dt>
+                    <dd class="col-sm-8">@Model.Region</dd>
+
+                    <dt class="col-sm-4">Contracts</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-secondary">@Model.Contracts.Count</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input asp-for="Id" type="hidden" />
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-danger">Yes, Delete Client</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>

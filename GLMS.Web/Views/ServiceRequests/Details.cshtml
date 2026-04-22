@@ -1,0 +1,86 @@
+@model GLMS.Web.Models.ServiceRequest
+@using GLMS.Web.Models
+@{
+    ViewData["Title"] = "Service Request Details";
+
+    var statusClass = Model.Status switch
+    {
+        ServiceRequestStatus.Pending    => "badge bg-secondary",
+        ServiceRequestStatus.InProgress => "badge bg-primary",
+        ServiceRequestStatus.Completed  => "badge bg-success",
+        ServiceRequestStatus.Cancelled  => "badge bg-danger",
+        _                               => "badge bg-secondary"
+    };
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <h2 class="mb-0">Service Request #@Model.Id</h2>
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card mb-4">
+            <div class="card-header fw-semibold">Request Details</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8"><span class="@statusClass">@Model.Status</span></dd>
+
+                    <dt class="col-sm-4">Description</dt>
+                    <dd class="col-sm-8">@Model.Description</dd>
+
+                    <dt class="col-sm-4">Cost (USD)</dt>
+                    <dd class="col-sm-8">$@Model.CostUSD.ToString("N2")</dd>
+
+                    <dt class="col-sm-4">Cost (ZAR)</dt>
+                    <dd class="col-sm-8">R @Model.CostZAR.ToString("N2")</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header fw-semibold">Linked Contract</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Client</dt>
+                    <dd class="col-sm-8">@Model.Contract.Client.Name</dd>
+
+                    <dt class="col-sm-4">Service Level</dt>
+                    <dd class="col-sm-8">@Model.Contract.ServiceLevel</dd>
+
+                    <dt class="col-sm-4">Contract Period</dt>
+                    <dd class="col-sm-8">
+                        @Model.Contract.StartDate.ToString("yyyy-MM-dd")
+                        &ndash;
+                        @Model.Contract.EndDate.ToString("yyyy-MM-dd")
+                    </dd>
+
+                    <dt class="col-sm-4">Contract Status</dt>
+                    <dd class="col-sm-8">
+                        @{
+                            var contractBadge = Model.Contract.Status switch
+                            {
+                                ContractStatus.Active  => "badge bg-success",
+                                ContractStatus.Expired => "badge bg-danger",
+                                ContractStatus.OnHold  => "badge bg-warning text-dark",
+                                _                      => "badge bg-secondary"
+                            };
+                        }
+                        <span class="@contractBadge">@Model.Contract.Status</span>
+                    </dd>
+
+                    <dt class="col-sm-4"></dt>
+                    <dd class="col-sm-8">
+                        <a asp-controller="Contracts" asp-action="Details"
+                           asp-route-id="@Model.ContractId"
+                           class="btn btn-sm btn-outline-secondary mt-1">View Contract</a>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>

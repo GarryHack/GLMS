@@ -1,0 +1,118 @@
+@model GLMS.Web.Models.Contract
+@using GLMS.Web.Models
+@{
+    ViewData["Title"] = "Contract Details";
+
+    var badgeClass = Model.Status switch
+    {
+        ContractStatus.Active  => "badge bg-success",
+        ContractStatus.Expired => "badge bg-danger",
+        ContractStatus.OnHold  => "badge bg-warning text-dark",
+        _                      => "badge bg-secondary"
+    };
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <h2 class="mb-0">Contract #@Model.Id</h2>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back to Contracts</a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-7">
+        <div class="card mb-4">
+            <div class="card-header fw-semibold">Contract Details</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Client</dt>
+                    <dd class="col-sm-8">
+                        <a asp-controller="Clients" asp-action="Details"
+                           asp-route-id="@Model.ClientId">@Model.Client.Name</a>
+                    </dd>
+
+                    <dt class="col-sm-4">Service Level</dt>
+                    <dd class="col-sm-8">@Model.ServiceLevel</dd>
+
+                    <dt class="col-sm-4">Start Date</dt>
+                    <dd class="col-sm-8">@Model.StartDate.ToString("yyyy-MM-dd")</dd>
+
+                    <dt class="col-sm-4">End Date</dt>
+                    <dd class="col-sm-8">@Model.EndDate.ToString("yyyy-MM-dd")</dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8"><span class="@badgeClass">@Model.Status</span></dd>
+
+                    <dt class="col-sm-4">Signed Agreement</dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrEmpty(Model.SignedAgreementPath))
+                        {
+                            <a asp-action="Download" asp-route-id="@Model.Id"
+                               class="btn btn-sm btn-outline-danger">Download PDF</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No file uploaded</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">
+        Service Requests <span class="badge bg-secondary">@Model.ServiceRequests.Count</span>
+    </h4>
+    @if (Model.Status == ContractStatus.Active || Model.Status == ContractStatus.Draft)
+    {
+        <a asp-controller="ServiceRequests" asp-action="Create"
+           class="btn btn-sm btn-primary">+ New Request</a>
+    }
+</div>
+
+@if (!Model.ServiceRequests.Any())
+{
+    <div class="alert alert-info">No service requests linked to this contract.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Description</th>
+                    <th class="text-end">Cost (USD)</th>
+                    <th class="text-end">Cost (ZAR)</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var sr in Model.ServiceRequests)
+                {
+                    var srBadge = sr.Status switch
+                    {
+                        ServiceRequestStatus.Pending    => "badge bg-secondary",
+                        ServiceRequestStatus.InProgress => "badge bg-primary",
+                        ServiceRequestStatus.Completed  => "badge bg-success",
+                        ServiceRequestStatus.Cancelled  => "badge bg-danger",
+                        _                               => "badge bg-secondary"
+                    };
+                    <tr>
+                        <td>@sr.Description</td>
+                        <td class="text-end">$@sr.CostUSD.ToString("N2")</td>
+                        <td class="text-end">R @sr.CostZAR.ToString("N2")</td>
+                        <td><span class="@srBadge">@sr.Status</span></td>
+                        <td class="text-end">
+                            <a asp-controller="ServiceRequests" asp-action="Details"
+                               asp-route-id="@sr.Id" class="btn btn-sm btn-outline-secondary">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
