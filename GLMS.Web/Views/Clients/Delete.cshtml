@@ -3,42 +3,70 @@
     ViewData["Title"] = "Delete Client";
 }
 
-<h2 class="mb-4 text-danger">Delete Client</h2>
-
-<div class="alert alert-warning">
-    <strong>Warning:</strong> Deleting this client will also delete all of their contracts and service requests.
-    This action cannot be undone.
+<div class="page-header">
+    <div>
+        <h1 style="color:var(--danger)">Delete Client</h1>
+        <div class="page-sub">This action cannot be undone</div>
+    </div>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn-glms-outline">
+        <i class="bi bi-arrow-left"></i>
+        Cancel
+    </a>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card border-danger">
-            <div class="card-header bg-danger text-white fw-semibold">Client to be deleted</div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Name</dt>
-                    <dd class="col-sm-8">@Model.Name</dd>
-
-                    <dt class="col-sm-4">Contact</dt>
-                    <dd class="col-sm-8">@Model.ContactDetails</dd>
-
-                    <dt class="col-sm-4">Region</dt>
-                    <dd class="col-sm-8">@Model.Region</dd>
-
-                    <dt class="col-sm-4">Contracts</dt>
-                    <dd class="col-sm-8">
-                        <span class="badge bg-secondary">@Model.Contracts.Count</span>
-                    </dd>
-                </dl>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="alert d-flex align-items-start gap-3 mb-4" style="background:#fef3c7;border:1px solid #fde68a;border-radius:var(--radius);padding:16px 20px">
+            <i class="bi bi-exclamation-triangle-fill text-warning fs-5 mt-1"></i>
+            <div>
+                <div class="fw-700 mb-1">Cascading Delete Warning</div>
+                <div style="font-size:14px">
+                    Deleting <strong>@Model.Name</strong> will permanently remove all
+                    <strong>@Model.Contracts.Count contract@(Model.Contracts.Count == 1 ? "" : "s")</strong>
+                    and all linked service requests. This cannot be undone.
+                </div>
             </div>
         </div>
+
+        <div class="danger-zone mb-4">
+            <div class="danger-zone-header">
+                <i class="bi bi-person-x-fill"></i>
+                Client to be deleted
+            </div>
+            <div class="danger-zone-body">
+                <div class="detail-row">
+                    <div class="detail-label">Name</div>
+                    <div class="detail-value fw-700">@Model.Name</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Contact</div>
+                    <div class="detail-value" style="font-size:13px">@Model.ContactDetails</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Region</div>
+                    <div class="detail-value">@Model.Region</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Contracts</div>
+                    <div class="detail-value">
+                        <span class="status-badge status-expired">@Model.Contracts.Count will be deleted</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="Delete" method="post">
+            <input asp-for="Id" type="hidden" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-glms-danger">
+                    <i class="bi bi-trash3"></i>
+                    Yes, Delete Client
+                </button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn-glms-outline">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </a>
+            </div>
+        </form>
     </div>
 </div>
-
-<form asp-action="Delete" method="post">
-    <input asp-for="Id" type="hidden" />
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-danger">Yes, Delete Client</button>
-        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
-    </div>
-</form>

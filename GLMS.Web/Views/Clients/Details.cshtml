@@ -4,82 +4,118 @@
     ViewData["Title"] = Model.Name;
 }
 
-<div class="d-flex justify-content-between align-items-start mb-4">
-    <h2 class="mb-0">@Model.Name</h2>
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <div style="width:48px;height:48px;border-radius:12px;background:#dbeafe;color:#1d4ed8;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px">
+            @Model.Name[0]
+        </div>
+        <div>
+            <h1>@Model.Name</h1>
+            <div class="page-sub"><i class="bi bi-geo-alt me-1"></i>@Model.Region</div>
+        </div>
+    </div>
     <div class="d-flex gap-2">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit</a>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back to Clients</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn-glms-primary">
+            <i class="bi bi-pencil"></i>
+            Edit
+        </a>
+        <a asp-action="Index" class="btn-glms-outline">
+            <i class="bi bi-arrow-left"></i>
+            Back
+        </a>
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header fw-semibold">Client Details</div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Name</dt>
-                    <dd class="col-sm-8">@Model.Name</dd>
-
-                    <dt class="col-sm-4">Contact</dt>
-                    <dd class="col-sm-8">@Model.ContactDetails</dd>
-
-                    <dt class="col-sm-4">Region</dt>
-                    <dd class="col-sm-8">@Model.Region</dd>
-                </dl>
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <i class="bi bi-person-badge"></i>
+                Client Details
+            </div>
+            <div class="detail-card-body">
+                <div class="detail-row">
+                    <div class="detail-label">Name</div>
+                    <div class="detail-value fw-600">@Model.Name</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Contact</div>
+                    <div class="detail-value" style="font-size:13px;white-space:pre-line">@Model.ContactDetails</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Region</div>
+                    <div class="detail-value">
+                        <i class="bi bi-geo-alt me-1 text-muted"></i>@Model.Region
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Contracts</div>
+                    <div class="detail-value">
+                        <span class="status-badge status-draft">@Model.Contracts.Count total</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0">Contracts <span class="badge bg-secondary">@Model.Contracts.Count</span></h4>
-    <a asp-controller="Contracts" asp-action="Create" class="btn btn-sm btn-primary">+ New Contract</a>
-</div>
+    <div class="col-lg-8">
+        <div class="glms-table-wrapper">
+            <div class="glms-table-header">
+                <h5><i class="bi bi-file-earmark-text me-2 text-primary"></i>Contracts</h5>
+                <a asp-controller="Contracts" asp-action="Create" class="btn-glms-primary" style="font-size:13px;padding:7px 14px">
+                    <i class="bi bi-plus-circle"></i>
+                    New Contract
+                </a>
+            </div>
 
-@if (!Model.Contracts.Any())
-{
-    <div class="alert alert-info">This client has no contracts yet.</div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-sm table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Service Level</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var contract in Model.Contracts.OrderByDescending(c => c.StartDate))
-                {
-                    <tr>
-                        <td>@contract.ServiceLevel</td>
-                        <td>@contract.StartDate.ToString("yyyy-MM-dd")</td>
-                        <td>@contract.EndDate.ToString("yyyy-MM-dd")</td>
-                        <td>
-                            @{
+            @if (!Model.Contracts.Any())
+            {
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="bi bi-file-earmark-text"></i></div>
+                    <h5>No contracts yet</h5>
+                    <p>Create the first contract for this client.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table glms-table">
+                        <thead>
+                            <tr>
+                                <th>Service Level</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var contract in Model.Contracts.OrderByDescending(c => c.StartDate))
+                            {
                                 var badgeClass = contract.Status switch
                                 {
-                                    ContractStatus.Active  => "badge bg-success",
-                                    ContractStatus.Expired => "badge bg-danger",
-                                    ContractStatus.OnHold  => "badge bg-warning text-dark",
-                                    _                      => "badge bg-secondary"
+                                    ContractStatus.Active  => "status-active",
+                                    ContractStatus.Expired => "status-expired",
+                                    ContractStatus.OnHold  => "status-onhold",
+                                    _                      => "status-draft"
                                 };
+                                <tr>
+                                    <td class="fw-600">@contract.ServiceLevel</td>
+                                    <td style="font-size:13px;color:var(--text-secondary)">@contract.StartDate.ToString("dd MMM yyyy")</td>
+                                    <td style="font-size:13px;color:var(--text-secondary)">@contract.EndDate.ToString("dd MMM yyyy")</td>
+                                    <td><span class="status-badge @badgeClass">@contract.Status</span></td>
+                                    <td class="text-center">
+                                        <a asp-controller="Contracts" asp-action="Details" asp-route-id="@contract.Id"
+                                           class="btn-icon view" title="View Contract">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
                             }
-                            <span class="@badgeClass">@contract.Status</span>
-                        </td>
-                        <td class="text-end">
-                            <a asp-controller="Contracts" asp-action="Details" asp-route-id="@contract.Id"
-                               class="btn btn-sm btn-outline-secondary">View</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
     </div>
-}
+</div>

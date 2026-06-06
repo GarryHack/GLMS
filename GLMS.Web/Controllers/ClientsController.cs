@@ -1,34 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GLMS.Web.Data;
 using GLMS.Web.Models;
+using GLMS.Web.Services;
 
 namespace GLMS.Web.Controllers;
 
 public class ClientsController : Controller
 {
-    private readonly AppDbContext _context;
+    private readonly GlmsApiClient _api;
 
-    public ClientsController(AppDbContext context)
+    public ClientsController(GlmsApiClient api)
     {
-        _context = context;
+        _api = api;
     }
 
     public async Task<IActionResult> Index()
     {
-        var clients = await _context.Clients
-            .Include(c => c.Contracts)
-            .OrderBy(c => c.Name)
-            .ToListAsync();
-
+        List<Client> clients = await _api.GetClientsAsync();
         return View(clients);
     }
 
     public async Task<IActionResult> Details(int id)
     {
-        var client = await _context.Clients
-            .Include(c => c.Contracts)
-            .FirstOrDefaultAsync(c => c.Id == id);
+        Client client = await _api.GetClientAsync(id);
 
         if (client == null)
             return NotFound();
@@ -48,15 +41,20 @@ public class ClientsController : Controller
         if (!ModelState.IsValid)
             return View(client);
 
-        _context.Clients.Add(client);
-        await _context.SaveChangesAsync();
+        var (success, error) = await _api.CreateClientAsync(client);
+
+        if (!success)
+        {
+            ModelState.AddModelError(string.Empty, error ?? "Failed to create client.");
+            return View(client);
+        }
 
         return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Edit(int id)
     {
-        var client = await _context.Clients.FindAsync(id);
+        Client client = await _api.GetClientAsync(id);
 
         if (client == null)
             return NotFound();
@@ -74,17 +72,12 @@ public class ClientsController : Controller
         if (!ModelState.IsValid)
             return View(client);
 
-        try
-        {
-            _context.Clients.Update(client);
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!await _context.Clients.AnyAsync(c => c.Id == id))
-                return NotFound();
+        var (success, error) = await _api.UpdateClientAsync(id, client);
 
-            throw;
+        if (!success)
+        {
+            ModelState.AddModelError(string.Empty, error ?? "Failed to update client.");
+            return View(client);
         }
 
         return RedirectToAction(nameof(Index));
@@ -92,9 +85,7 @@ public class ClientsController : Controller
 
     public async Task<IActionResult> Delete(int id)
     {
-        var client = await _context.Clients
-            .Include(c => c.Contracts)
-            .FirstOrDefaultAsync(c => c.Id == id);
+        Client client = await _api.GetClientAsync(id);
 
         if (client == null)
             return NotFound();
@@ -106,14 +97,7 @@ public class ClientsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var client = await _context.Clients.FindAsync(id);
-
-        if (client == null)
-            return NotFound();
-
-        _context.Clients.Remove(client);
-        await _context.SaveChangesAsync();
-
+        await _api.DeleteClientAsync(id);
         return RedirectToAction(nameof(Index));
     }
 }

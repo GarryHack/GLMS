@@ -2,59 +2,87 @@
 @using GLMS.Web.Models
 @{
     ViewData["Title"] = "Delete Service Request";
+
+    var statusClass = Model.Status switch
+    {
+        ServiceRequestStatus.Pending    => "status-pending",
+        ServiceRequestStatus.InProgress => "status-inprogress",
+        ServiceRequestStatus.Completed  => "status-completed",
+        ServiceRequestStatus.Cancelled  => "status-cancelled",
+        _                               => "status-pending"
+    };
 }
 
-<h2 class="mb-4 text-danger">Delete Service Request</h2>
-
-<div class="alert alert-warning">
-    <strong>Warning:</strong> This will permanently delete this service request. This action cannot be undone.
+<div class="page-header">
+    <div>
+        <h1 style="color:var(--danger)">Delete Service Request</h1>
+        <div class="page-sub">Request #@Model.Id — This action cannot be undone</div>
+    </div>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn-glms-outline">
+        <i class="bi bi-arrow-left"></i>
+        Cancel
+    </a>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card border-danger">
-            <div class="card-header bg-danger text-white fw-semibold">Request to be deleted</div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-5">Contract / Client</dt>
-                    <dd class="col-sm-7">
-                        @Model.Contract.Client.Name
-                        <div class="text-muted small">@Model.Contract.ServiceLevel</div>
-                    </dd>
-
-                    <dt class="col-sm-5">Description</dt>
-                    <dd class="col-sm-7">@Model.Description</dd>
-
-                    <dt class="col-sm-5">Cost (USD)</dt>
-                    <dd class="col-sm-7">$@Model.CostUSD.ToString("N2")</dd>
-
-                    <dt class="col-sm-5">Cost (ZAR)</dt>
-                    <dd class="col-sm-7">R @Model.CostZAR.ToString("N2")</dd>
-
-                    <dt class="col-sm-5">Status</dt>
-                    <dd class="col-sm-7">
-                        @{
-                            var statusClass = Model.Status switch
-                            {
-                                ServiceRequestStatus.Pending    => "badge bg-secondary",
-                                ServiceRequestStatus.InProgress => "badge bg-primary",
-                                ServiceRequestStatus.Completed  => "badge bg-success",
-                                ServiceRequestStatus.Cancelled  => "badge bg-danger",
-                                _                               => "badge bg-secondary"
-                            };
-                        }
-                        <span class="@statusClass">@Model.Status</span>
-                    </dd>
-                </dl>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="alert d-flex align-items-start gap-3 mb-4" style="background:#fef3c7;border:1px solid #fde68a;border-radius:var(--radius);padding:16px 20px">
+            <i class="bi bi-exclamation-triangle-fill text-warning fs-5 mt-1"></i>
+            <div>
+                <div class="fw-700 mb-1">Permanent Deletion</div>
+                <div style="font-size:14px">
+                    This service request will be permanently deleted. There is no way to recover it.
+                </div>
             </div>
         </div>
+
+        <div class="danger-zone mb-4">
+            <div class="danger-zone-header">
+                <i class="bi bi-clipboard2-x-fill"></i>
+                Request to be deleted
+            </div>
+            <div class="danger-zone-body">
+                <div class="detail-row">
+                    <div class="detail-label">Client</div>
+                    <div class="detail-value fw-700">@Model.Contract.Client.Name</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Contract</div>
+                    <div class="detail-value" style="font-size:13px">@Model.Contract.ServiceLevel</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Description</div>
+                    <div class="detail-value" style="font-size:13px">@Model.Description</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Cost (USD)</div>
+                    <div class="detail-value text-mono">$@Model.CostUSD.ToString("N2")</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Cost (ZAR)</div>
+                    <div class="detail-value text-mono">R @Model.CostZAR.ToString("N2")</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value">
+                        <span class="status-badge @statusClass">@Model.Status</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="Delete" method="post">
+            <input asp-for="Id" type="hidden" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-glms-danger">
+                    <i class="bi bi-trash3"></i>
+                    Yes, Delete Request
+                </button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn-glms-outline">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </a>
+            </div>
+        </form>
     </div>
 </div>
-
-<form asp-action="Delete" method="post">
-    <input asp-for="Id" type="hidden" />
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-danger">Yes, Delete Request</button>
-        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
-    </div>
-</form>

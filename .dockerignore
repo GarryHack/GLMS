@@ -1,0 +1,9 @@
+**/.git
+**/.gitignore
+**/bin
+**/obj
+**/Migrations
+**/*.user
+**/.vs
+**/DESIGN_PATTERNS.md
+**/REFLECTION_REPORT.md

@@ -3,37 +3,76 @@
     ViewData["Title"] = "Edit Client";
 }
 
-<h2 class="mb-4">Edit Client</h2>
+<div class="page-header">
+    <div>
+        <h1>Edit Client</h1>
+        <div class="page-sub">@Model.Name</div>
+    </div>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn-glms-outline">
+        <i class="bi bi-arrow-left"></i>
+        Back to Details
+    </a>
+</div>
 
 <div class="row">
-    <div class="col-md-6">
-        <form asp-action="Edit" method="post">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-            <input asp-for="Id" type="hidden" />
-
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label fw-semibold"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger small"></span>
+    <div class="col-lg-7">
+        <div class="glms-form-card">
+            <div class="form-header">
+                <div class="form-header-icon">
+                    <i class="bi bi-pencil-square"></i>
+                </div>
+                <div>
+                    <div style="font-weight:700;font-size:15px">Edit Client Information</div>
+                    <div style="font-size:12px;color:var(--text-secondary)">Update the details and save</div>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="ContactDetails" class="form-label fw-semibold"></label>
-                <textarea asp-for="ContactDetails" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="ContactDetails" class="text-danger small"></span>
-            </div>
+            <form asp-action="Edit" method="post">
+                <div class="form-body">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div></div>
+                    </div>
 
-            <div class="mb-4">
-                <label asp-for="Region" class="form-label fw-semibold"></label>
-                <input asp-for="Region" class="form-control" />
-                <span asp-validation-for="Region" class="text-danger small"></span>
-            </div>
+                    <input asp-for="Id" type="hidden" />
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
-            </div>
-        </form>
+                    <div class="mb-4">
+                        <label asp-for="Name" class="form-label">Company Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-building"></i></span>
+                            <input asp-for="Name" class="form-control" />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ContactDetails" class="form-label">Contact Details</label>
+                        <div class="input-group align-items-start">
+                            <span class="input-group-text"><i class="bi bi-person-lines-fill"></i></span>
+                            <textarea asp-for="ContactDetails" class="form-control" rows="3"></textarea>
+                        </div>
+                        <span asp-validation-for="ContactDetails" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="Region" class="form-label">Region</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            <input asp-for="Region" class="form-control" />
+                        </div>
+                        <span asp-validation-for="Region" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <button type="submit" class="btn-glms-primary">
+                        <i class="bi bi-check-circle"></i>
+                        Save Changes
+                    </button>
+                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn-glms-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

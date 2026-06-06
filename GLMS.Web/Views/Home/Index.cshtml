@@ -1,8 +1,148 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero -->
+<div class="glms-hero">
+    <div class="hero-badge">
+        <i class="bi bi-globe2"></i>
+        Global Logistics Management System
+    </div>
+    <h1 class="hero-title">
+        Manage Freight Contracts<br />
+        <span>at Global Scale</span>
+    </h1>
+    <p class="hero-subtitle">
+        TechMove Logistics — your unified platform for international freight contracts,
+        driver schedules, and service invoices with live currency conversion.
+    </p>
+    <div class="hero-actions">
+        <a asp-controller="Contracts" asp-action="Index" class="btn-hero-primary">
+            <i class="bi bi-file-earmark-text"></i>
+            View Contracts
+        </a>
+        <a asp-controller="Clients" asp-action="Create" class="btn-hero-outline">
+            <i class="bi bi-person-plus"></i>
+            Add Client
+        </a>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <a asp-controller="Clients" asp-action="Index" class="quick-card">
+            <div class="quick-card-icon blue">
+                <i class="bi bi-people"></i>
+            </div>
+            <div>
+                <div class="quick-card-title">Client Registry</div>
+                <div class="quick-card-sub">Manage all logistics clients and regions</div>
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted" style="font-size:12px"></i>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Contracts" asp-action="Index" class="quick-card">
+            <div class="quick-card-icon" style="background:#f0fdf4;color:#059669">
+                <i class="bi bi-file-earmark-text"></i>
+            </div>
+            <div>
+                <div class="quick-card-title">Contract Hub</div>
+                <div class="quick-card-sub">Track active, draft and expired contracts</div>
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted" style="font-size:12px"></i>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="ServiceRequests" asp-action="Index" class="quick-card">
+            <div class="quick-card-icon" style="background:#fef3c7;color:#d97706">
+                <i class="bi bi-clipboard2-check"></i>
+            </div>
+            <div>
+                <div class="quick-card-title">Service Requests</div>
+                <div class="quick-card-sub">Process freight service requests and invoices</div>
+            </div>
+            <i class="bi bi-chevron-right ms-auto text-muted" style="font-size:12px"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Feature Highlights -->
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="glms-card h-100">
+            <div class="card-header">
+                <i class="bi bi-currency-exchange me-2"></i>
+                Live Currency Integration
+            </div>
+            <div class="card-body">
+                <p class="text-secondary mb-3" style="font-size:14px">
+                    All service requests automatically convert USD costs to ZAR using the live exchange rate
+                    from the Open Exchange Rates API. Falls back to a safe rate of R 18.50 per USD if the
+                    API is unavailable.
+                </p>
+                <a asp-controller="ServiceRequests" asp-action="Create" class="btn-glms-primary" style="font-size:13px;padding:8px 14px">
+                    <i class="bi bi-plus-circle"></i>
+                    Create Service Request
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="glms-card h-100">
+            <div class="card-header">
+                <i class="bi bi-funnel me-2"></i>
+                Contract Filtering
+            </div>
+            <div class="card-body">
+                <p class="text-secondary mb-3" style="font-size:14px">
+                    Filter the contract list by status (Active, Draft, Expired, OnHold) and by date range.
+                    Signed PDF agreements can be uploaded and downloaded directly from each contract.
+                </p>
+                <a asp-controller="Contracts" asp-action="Index" class="btn-glms-primary" style="font-size:13px;padding:8px 14px">
+                    <i class="bi bi-search"></i>
+                    Browse Contracts
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="glms-card h-100">
+            <div class="card-header">
+                <i class="bi bi-shield-check me-2"></i>
+                Business Rule Enforcement
+            </div>
+            <div class="card-body">
+                <p class="text-secondary mb-3" style="font-size:14px">
+                    Service requests can only be created against <strong>Active</strong> or
+                    <strong>Draft</strong> contracts. Expired and OnHold contracts are automatically
+                    excluded from the contract selection dropdown.
+                </p>
+                <a asp-controller="Contracts" asp-action="Create" class="btn-glms-primary" style="font-size:13px;padding:8px 14px">
+                    <i class="bi bi-file-earmark-plus"></i>
+                    New Contract
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="glms-card h-100">
+            <div class="card-header">
+                <i class="bi bi-cloud-upload me-2"></i>
+                PDF Agreement Storage
+            </div>
+            <div class="card-body">
+                <p class="text-secondary mb-3" style="font-size:14px">
+                    Upload signed agreement PDFs directly when creating or editing a contract.
+                    Files are stored securely with a unique GUID prefix and can be downloaded
+                    at any time.
+                </p>
+                <a asp-controller="Clients" asp-action="Create" class="btn-glms-primary" style="font-size:13px;padding:8px 14px">
+                    <i class="bi bi-person-plus"></i>
+                    Add New Client
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using GLMS.Web.Data;
 using GLMS.Web.Models;
 using GLMS.Web.Services;
 
@@ -9,32 +7,22 @@ namespace GLMS.Web.Controllers;
 
 public class ServiceRequestsController : Controller
 {
-    private readonly AppDbContext _context;
-    private readonly CurrencyService _currencyService;
+    private readonly GlmsApiClient _api;
 
-    public ServiceRequestsController(AppDbContext context, CurrencyService currencyService)
+    public ServiceRequestsController(GlmsApiClient api)
     {
-        _context = context;
-        _currencyService = currencyService;
+        _api = api;
     }
 
     public async Task<IActionResult> Index()
     {
-        var requests = await _context.ServiceRequests
-            .Include(sr => sr.Contract)
-                .ThenInclude(c => c.Client)
-            .OrderByDescending(sr => sr.Id)
-            .ToListAsync();
-
+        List<ServiceRequest> requests = await _api.GetServiceRequestsAsync();
         return View(requests);
     }
 
     public async Task<IActionResult> Details(int id)
     {
-        var serviceRequest = await _context.ServiceRequests
-            .Include(sr => sr.Contract)
-                .ThenInclude(c => c.Client)
-            .FirstOrDefaultAsync(sr => sr.Id == id);
+        ServiceRequest serviceRequest = await _api.GetServiceRequestAsync(id);
 
         if (serviceRequest == null)
             return NotFound();
@@ -44,7 +32,7 @@ public class ServiceRequestsController : Controller
 
     public async Task<IActionResult> Create()
     {
-        ViewBag.ZarRate = await _currencyService.GetUsdToZarRateAsync();
+        ViewBag.ZarRate = await _api.GetZarRateAsync();
         ViewBag.Contracts = await BuildActiveContractSelectListAsync();
         return View();
     }
@@ -53,44 +41,29 @@ public class ServiceRequestsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ServiceRequest serviceRequest)
     {
-        var contract = await _context.Contracts.FindAsync(serviceRequest.ContractId);
-
-        if (contract == null)
-        {
-            ModelState.AddModelError("ContractId", "The selected contract does not exist.");
-        }
-        else if (contract.Status == ContractStatus.Expired)
-        {
-            ModelState.AddModelError("ContractId",
-                "A service request cannot be created against an Expired contract.");
-        }
-        else if (contract.Status == ContractStatus.OnHold)
-        {
-            ModelState.AddModelError("ContractId",
-                "A service request cannot be created against a contract that is On Hold.");
-        }
-
         if (!ModelState.IsValid)
         {
-            ViewBag.ZarRate = await _currencyService.GetUsdToZarRateAsync();
+            ViewBag.ZarRate = await _api.GetZarRateAsync();
             ViewBag.Contracts = await BuildActiveContractSelectListAsync();
             return View(serviceRequest);
         }
 
-        serviceRequest.CostZAR = await _currencyService.ConvertUsdToZarAsync(serviceRequest.CostUSD);
+        var (success, error) = await _api.CreateServiceRequestAsync(serviceRequest);
 
-        _context.ServiceRequests.Add(serviceRequest);
-        await _context.SaveChangesAsync();
+        if (!success)
+        {
+            ModelState.AddModelError("ContractId", error ?? "Failed to create service request.");
+            ViewBag.ZarRate = await _api.GetZarRateAsync();
+            ViewBag.Contracts = await BuildActiveContractSelectListAsync();
+            return View(serviceRequest);
+        }
 
         return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Delete(int id)
     {
-        var serviceRequest = await _context.ServiceRequests
-            .Include(sr => sr.Contract)
-                .ThenInclude(c => c.Client)
-            .FirstOrDefaultAsync(sr => sr.Id == id);
+        ServiceRequest serviceRequest = await _api.GetServiceRequestAsync(id);
 
         if (serviceRequest == null)
             return NotFound();
@@ -102,30 +75,21 @@ public class ServiceRequestsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var serviceRequest = await _context.ServiceRequests.FindAsync(id);
-
-        if (serviceRequest == null)
-            return NotFound();
-
-        _context.ServiceRequests.Remove(serviceRequest);
-        await _context.SaveChangesAsync();
-
+        await _api.DeleteServiceRequestAsync(id);
         return RedirectToAction(nameof(Index));
     }
 
     private async Task<SelectList> BuildActiveContractSelectListAsync()
     {
-        var activeContracts = await _context.Contracts
-            .Include(c => c.Client)
-            .Where(c => c.Status == ContractStatus.Active)
-            .OrderBy(c => c.Client.Name)
-            .ToListAsync();
+        List<Contract> contracts = await _api.GetContractsAsync(ContractStatus.Active, null, null);
 
-        var items = activeContracts.Select(c => new
-        {
-            c.Id,
-            Display = $"{c.Client.Name} \u2014 {c.ServiceLevel}"
-        });
+        var items = contracts
+            .OrderBy(c => c.Client?.Name)
+            .Select(c => new
+            {
+                c.Id,
+                Display = $"{c.Client?.Name ?? "Unknown"} — {c.ServiceLevel}"
+            });
 
         return new SelectList(items, "Id", "Display");
     }

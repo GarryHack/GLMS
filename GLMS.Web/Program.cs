@@ -1,15 +1,18 @@
-using Microsoft.EntityFrameworkCore;
-using GLMS.Web.Data;
 using GLMS.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+var apiBase = builder.Configuration["ApiBaseUrl"]
+    ?? throw new InvalidOperationException("ApiBaseUrl is not configured.");
 
-builder.Services.AddHttpClient<CurrencyService>();
+Console.WriteLine($"[DIAG] ApiBaseUrl = {apiBase}");
+
+builder.Services.AddHttpClient<GlmsApiClient>(client =>
+{
+    client.BaseAddress = new Uri(apiBase.TrimEnd('/') + "/");
+});
 
 var app = builder.Build();
 

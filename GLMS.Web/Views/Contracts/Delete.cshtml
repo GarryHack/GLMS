@@ -5,55 +5,83 @@
 
     var badgeClass = Model.Status switch
     {
-        ContractStatus.Active  => "badge bg-success",
-        ContractStatus.Expired => "badge bg-danger",
-        ContractStatus.OnHold  => "badge bg-warning text-dark",
-        _                      => "badge bg-secondary"
+        ContractStatus.Active  => "status-active",
+        ContractStatus.Expired => "status-expired",
+        ContractStatus.OnHold  => "status-onhold",
+        _                      => "status-draft"
     };
 }
 
-<h2 class="mb-4 text-danger">Delete Contract</h2>
-
-<div class="alert alert-warning">
-    <strong>Warning:</strong> Deleting this contract will also delete all
-    <strong>@Model.ServiceRequests.Count</strong> linked service request(s). This cannot be undone.
+<div class="page-header">
+    <div>
+        <h1 style="color:var(--danger)">Delete Contract</h1>
+        <div class="page-sub">Contract #@Model.Id — @Model.Client.Name</div>
+    </div>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn-glms-outline">
+        <i class="bi bi-arrow-left"></i>
+        Cancel
+    </a>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card border-danger">
-            <div class="card-header bg-danger text-white fw-semibold">Contract to be deleted</div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-5">Client</dt>
-                    <dd class="col-sm-7">@Model.Client.Name</dd>
-
-                    <dt class="col-sm-5">Service Level</dt>
-                    <dd class="col-sm-7">@Model.ServiceLevel</dd>
-
-                    <dt class="col-sm-5">Start Date</dt>
-                    <dd class="col-sm-7">@Model.StartDate.ToString("yyyy-MM-dd")</dd>
-
-                    <dt class="col-sm-5">End Date</dt>
-                    <dd class="col-sm-7">@Model.EndDate.ToString("yyyy-MM-dd")</dd>
-
-                    <dt class="col-sm-5">Status</dt>
-                    <dd class="col-sm-7"><span class="@badgeClass">@Model.Status</span></dd>
-
-                    <dt class="col-sm-5">Service Requests</dt>
-                    <dd class="col-sm-7">
-                        <span class="badge bg-secondary">@Model.ServiceRequests.Count</span>
-                    </dd>
-                </dl>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="alert d-flex align-items-start gap-3 mb-4" style="background:#fef3c7;border:1px solid #fde68a;border-radius:var(--radius);padding:16px 20px">
+            <i class="bi bi-exclamation-triangle-fill text-warning fs-5 mt-1"></i>
+            <div>
+                <div class="fw-700 mb-1">Cascading Delete Warning</div>
+                <div style="font-size:14px">
+                    Deleting this contract will permanently remove
+                    <strong>@Model.ServiceRequests.Count service request@(Model.ServiceRequests.Count == 1 ? "" : "s")</strong>
+                    linked to it. This cannot be undone.
+                </div>
             </div>
         </div>
+
+        <div class="danger-zone mb-4">
+            <div class="danger-zone-header">
+                <i class="bi bi-file-earmark-x-fill"></i>
+                Contract to be deleted
+            </div>
+            <div class="danger-zone-body">
+                <div class="detail-row">
+                    <div class="detail-label">Client</div>
+                    <div class="detail-value fw-700">@Model.Client.Name</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Service Level</div>
+                    <div class="detail-value">@Model.ServiceLevel</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Period</div>
+                    <div class="detail-value" style="font-size:13px">
+                        @Model.StartDate.ToString("dd MMM yyyy") — @Model.EndDate.ToString("dd MMM yyyy")
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value"><span class="status-badge @badgeClass">@Model.Status</span></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Service Requests</div>
+                    <div class="detail-value">
+                        <span class="status-badge status-expired">@Model.ServiceRequests.Count will be deleted</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="Delete" method="post">
+            <input asp-for="Id" type="hidden" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-glms-danger">
+                    <i class="bi bi-trash3"></i>
+                    Yes, Delete Contract
+                </button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn-glms-outline">
+                    <i class="bi bi-x-circle"></i>
+                    Cancel
+                </a>
+            </div>
+        </form>
     </div>
 </div>
-
-<form asp-action="Delete" method="post">
-    <input asp-for="Id" type="hidden" />
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-danger">Yes, Delete Contract</button>
-        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
-    </div>
-</form>

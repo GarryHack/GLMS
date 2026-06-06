@@ -3,37 +3,75 @@
     ViewData["Title"] = "New Client";
 }
 
-<h2 class="mb-4">New Client</h2>
+<div class="page-header">
+    <div>
+        <h1>New Client</h1>
+        <div class="page-sub">Register a new logistics client</div>
+    </div>
+    <a asp-action="Index" class="btn-glms-outline">
+        <i class="bi bi-arrow-left"></i>
+        Back to Clients
+    </a>
+</div>
 
 <div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label fw-semibold"></label>
-                <input asp-for="Name" class="form-control" placeholder="e.g. Acme Logistics" />
-                <span asp-validation-for="Name" class="text-danger small"></span>
+    <div class="col-lg-7">
+        <div class="glms-form-card">
+            <div class="form-header">
+                <div class="form-header-icon">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <div>
+                    <div style="font-weight:700;font-size:15px">Client Information</div>
+                    <div style="font-size:12px;color:var(--text-secondary)">Fill in the client's details below</div>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="ContactDetails" class="form-label fw-semibold"></label>
-                <textarea asp-for="ContactDetails" class="form-control" rows="3"
-                          placeholder="e.g. john@acme.com | +27 11 000 0000"></textarea>
-                <span asp-validation-for="ContactDetails" class="text-danger small"></span>
-            </div>
+            <form asp-action="Create" method="post">
+                <div class="form-body">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div></div>
+                    </div>
 
-            <div class="mb-4">
-                <label asp-for="Region" class="form-label fw-semibold"></label>
-                <input asp-for="Region" class="form-control" placeholder="e.g. Sub-Saharan Africa" />
-                <span asp-validation-for="Region" class="text-danger small"></span>
-            </div>
+                    <div class="mb-4">
+                        <label asp-for="Name" class="form-label">Company Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-building"></i></span>
+                            <input asp-for="Name" class="form-control" placeholder="e.g. Acme Global Logistics" />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                    </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Save Client</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-            </div>
-        </form>
+                    <div class="mb-4">
+                        <label asp-for="ContactDetails" class="form-label">Contact Details</label>
+                        <div class="input-group align-items-start">
+                            <span class="input-group-text"><i class="bi bi-person-lines-fill"></i></span>
+                            <textarea asp-for="ContactDetails" class="form-control" rows="3"
+                                      placeholder="e.g. john@acme.com | +27 11 000 0000"></textarea>
+                        </div>
+                        <span asp-validation-for="ContactDetails" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <label asp-for="Region" class="form-label">Region</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            <input asp-for="Region" class="form-control" placeholder="e.g. Sub-Saharan Africa" />
+                        </div>
+                        <span asp-validation-for="Region" class="text-danger small mt-1 d-block"></span>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <button type="submit" class="btn-glms-primary">
+                        <i class="bi bi-check-circle"></i>
+                        Save Client
+                    </button>
+                    <a asp-action="Index" class="btn-glms-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

@@ -5,81 +5,141 @@
 
     var statusClass = Model.Status switch
     {
-        ServiceRequestStatus.Pending    => "badge bg-secondary",
-        ServiceRequestStatus.InProgress => "badge bg-primary",
-        ServiceRequestStatus.Completed  => "badge bg-success",
-        ServiceRequestStatus.Cancelled  => "badge bg-danger",
-        _                               => "badge bg-secondary"
+        ServiceRequestStatus.Pending    => "status-pending",
+        ServiceRequestStatus.InProgress => "status-inprogress",
+        ServiceRequestStatus.Completed  => "status-completed",
+        ServiceRequestStatus.Cancelled  => "status-cancelled",
+        _                               => "status-pending"
+    };
+
+    var contractBadge = Model.Contract.Status switch
+    {
+        ContractStatus.Active  => "status-active",
+        ContractStatus.Expired => "status-expired",
+        ContractStatus.OnHold  => "status-onhold",
+        _                      => "status-draft"
     };
 }
 
-<div class="d-flex justify-content-between align-items-start mb-4">
-    <h2 class="mb-0">Service Request #@Model.Id</h2>
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <div style="width:48px;height:48px;border-radius:12px;background:#fef3c7;color:#d97706;display:flex;align-items:center;justify-content:center;font-size:22px">
+            <i class="bi bi-clipboard2-check"></i>
+        </div>
+        <div>
+            <h1>Service Request #@Model.Id</h1>
+            <div class="page-sub">@Model.Contract.Client.Name — @Model.Contract.ServiceLevel</div>
+        </div>
+    </div>
     <div class="d-flex gap-2">
-        <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
-        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn-glms-outline" style="border-color:#fecaca;color:var(--danger)">
+            <i class="bi bi-trash"></i>
+            Delete
+        </a>
+        <a asp-action="Index" class="btn-glms-outline">
+            <i class="bi bi-arrow-left"></i>
+            Back
+        </a>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-7">
-        <div class="card mb-4">
-            <div class="card-header fw-semibold">Request Details</div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Status</dt>
-                    <dd class="col-sm-8"><span class="@statusClass">@Model.Status</span></dd>
-
-                    <dt class="col-sm-4">Description</dt>
-                    <dd class="col-sm-8">@Model.Description</dd>
-
-                    <dt class="col-sm-4">Cost (USD)</dt>
-                    <dd class="col-sm-8">$@Model.CostUSD.ToString("N2")</dd>
-
-                    <dt class="col-sm-4">Cost (ZAR)</dt>
-                    <dd class="col-sm-8">R @Model.CostZAR.ToString("N2")</dd>
-                </dl>
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <i class="bi bi-clipboard2"></i>
+                Request Details
+            </div>
+            <div class="detail-card-body">
+                <div class="detail-row">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value">
+                        <span class="status-badge @statusClass">@Model.Status</span>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Description</div>
+                    <div class="detail-value" style="font-size:13px;line-height:1.6">@Model.Description</div>
+                </div>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header fw-semibold">Linked Contract</div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Client</dt>
-                    <dd class="col-sm-8">@Model.Contract.Client.Name</dd>
-
-                    <dt class="col-sm-4">Service Level</dt>
-                    <dd class="col-sm-8">@Model.Contract.ServiceLevel</dd>
-
-                    <dt class="col-sm-4">Contract Period</dt>
-                    <dd class="col-sm-8">
-                        @Model.Contract.StartDate.ToString("yyyy-MM-dd")
-                        &ndash;
-                        @Model.Contract.EndDate.ToString("yyyy-MM-dd")
-                    </dd>
-
-                    <dt class="col-sm-4">Contract Status</dt>
-                    <dd class="col-sm-8">
-                        @{
-                            var contractBadge = Model.Contract.Status switch
-                            {
-                                ContractStatus.Active  => "badge bg-success",
-                                ContractStatus.Expired => "badge bg-danger",
-                                ContractStatus.OnHold  => "badge bg-warning text-dark",
-                                _                      => "badge bg-secondary"
-                            };
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <i class="bi bi-currency-exchange"></i>
+                Financials
+            </div>
+            <div class="detail-card-body">
+                <div class="detail-row">
+                    <div class="detail-label">Cost (USD)</div>
+                    <div class="detail-value text-mono fw-700" style="color:var(--primary)">
+                        $@Model.CostUSD.ToString("N2")
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Cost (ZAR)</div>
+                    <div class="detail-value text-mono fw-700" style="color:#059669;font-size:18px">
+                        R @Model.CostZAR.ToString("N2")
+                    </div>
+                </div>
+                <div class="detail-row" style="border-bottom:none">
+                    <div class="detail-label">Rate Used</div>
+                    <div class="detail-value" style="font-size:13px;color:var(--text-secondary)">
+                        @if (Model.CostUSD > 0)
+                        {
+                            @((Model.CostZAR / Model.CostUSD).ToString("F4"))
+                            <span> ZAR/USD</span>
                         }
-                        <span class="@contractBadge">@Model.Contract.Status</span>
-                    </dd>
+                        else
+                        {
+                            <span>—</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <dt class="col-sm-4"></dt>
-                    <dd class="col-sm-8">
+    <div class="col-lg-7">
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <i class="bi bi-file-earmark-text"></i>
+                Linked Contract
+            </div>
+            <div class="detail-card-body">
+                <div class="detail-row">
+                    <div class="detail-label">Client</div>
+                    <div class="detail-value fw-700">@Model.Contract.Client.Name</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Service Level</div>
+                    <div class="detail-value">@Model.Contract.ServiceLevel</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Period</div>
+                    <div class="detail-value" style="font-size:13px">
+                        @Model.Contract.StartDate.ToString("dd MMM yyyy")
+                        &ndash;
+                        @Model.Contract.EndDate.ToString("dd MMM yyyy")
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Contract Status</div>
+                    <div class="detail-value">
+                        <span class="status-badge @contractBadge">@Model.Contract.Status</span>
+                    </div>
+                </div>
+                <div class="detail-row" style="border-bottom:none">
+                    <div class="detail-label"></div>
+                    <div class="detail-value">
                         <a asp-controller="Contracts" asp-action="Details"
                            asp-route-id="@Model.ContractId"
-                           class="btn btn-sm btn-outline-secondary mt-1">View Contract</a>
-                    </dd>
-                </dl>
+                           class="btn-glms-outline" style="font-size:12px;padding:7px 14px;margin-top:4px">
+                            <i class="bi bi-file-earmark-text"></i>
+                            View Full Contract
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

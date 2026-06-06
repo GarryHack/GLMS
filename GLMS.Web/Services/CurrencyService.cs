@@ -17,7 +17,7 @@ public class CurrencyService
     {
         try
         {
-            var response = await _httpClient.GetAsync(ApiUrl);
+            HttpResponseMessage response = await _httpClient.GetAsync(ApiUrl);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
@@ -39,7 +39,7 @@ public class CurrencyService
 
     public async Task<decimal> ConvertUsdToZarAsync(decimal amountUsd)
     {
-        var rate = await GetUsdToZarRateAsync();
+        decimal rate = await GetUsdToZarRateAsync();
         return Math.Round(amountUsd * rate, 2);
     }
 }

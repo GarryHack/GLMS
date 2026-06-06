@@ -4,64 +4,145 @@
     ViewData["Title"] = "New Service Request";
 }
 
-<h2 class="mb-4">New Service Request</h2>
+<div class="page-header">
+    <div>
+        <h1>New Service Request</h1>
+        <div class="page-sub">Link a request to an active contract with live ZAR pricing</div>
+    </div>
+    <a asp-action="Index" class="btn-glms-outline">
+        <i class="bi bi-arrow-left"></i>
+        Back to Requests
+    </a>
+</div>
 
-<div class="row">
-    <div class="col-md-7">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-            <div class="mb-3">
-                <label asp-for="ContractId" class="form-label fw-semibold">Contract</label>
-                <select asp-for="ContractId" asp-items="ViewBag.Contracts" class="form-select">
-                    <option value="">-- Select an Active Contract --</option>
-                </select>
-                <span asp-validation-for="ContractId" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Description" class="form-label fw-semibold"></label>
-                <textarea asp-for="Description" class="form-control" rows="4"
-                          placeholder="Describe the service request in detail..."></textarea>
-                <span asp-validation-for="Description" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="CostUSD" class="form-label fw-semibold">Cost (USD)</label>
-                <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input asp-for="CostUSD" type="number" step="0.01" min="0"
-                           class="form-control" id="costUsdInput" placeholder="0.00" />
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="glms-form-card">
+            <div class="form-header">
+                <div class="form-header-icon">
+                    <i class="bi bi-send-plus"></i>
                 </div>
-                <span asp-validation-for="CostUSD" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Cost (ZAR) <span class="badge bg-info text-dark ms-1">Auto-calculated</span></label>
-                <div class="input-group">
-                    <span class="input-group-text">R</span>
-                    <input type="text" id="costZarDisplay" class="form-control bg-light"
-                           readonly placeholder="0.00" />
-                </div>
-                <div class="form-text">
-                    Live rate: <strong id="rateDisplay"></strong> ZAR per USD
-                    <span class="text-muted">(falls back to 18.50 if API unavailable)</span>
+                <div>
+                    <div style="font-weight:700;font-size:15px">Request Details</div>
+                    <div style="font-size:12px;color:var(--text-secondary)">Only Active and Draft contracts are shown</div>
                 </div>
             </div>
 
-            <div class="mb-4">
-                <label asp-for="Status" class="form-label fw-semibold"></label>
-                <select asp-for="Status"
-                        asp-items="Html.GetEnumSelectList<ServiceRequestStatus>()"
-                        class="form-select"></select>
-                <span asp-validation-for="Status" class="text-danger small"></span>
-            </div>
+            <form asp-action="Create" method="post">
+                <div class="form-body">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div></div>
+                    </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Save Request</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    <div class="form-section-title">Contract Linkage</div>
+
+                    <div class="mb-4">
+                        <label asp-for="ContractId" class="form-label">Contract</label>
+                        <select asp-for="ContractId" asp-items="ViewBag.Contracts" class="form-select">
+                            <option value="">— Select an Active Contract —</option>
+                        </select>
+                        <span asp-validation-for="ContractId" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="form-section-title mt-2">Request Information</div>
+
+                    <div class="mb-4">
+                        <label asp-for="Description" class="form-label">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="4"
+                                  placeholder="Describe the service request in detail..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Status" class="form-label">Status</label>
+                        <select asp-for="Status"
+                                asp-items="Html.GetEnumSelectList<ServiceRequestStatus>()"
+                                class="form-select"></select>
+                        <span asp-validation-for="Status" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="form-section-title mt-2">Pricing</div>
+
+                    <div class="mb-4">
+                        <label asp-for="CostUSD" class="form-label">Cost (USD)</label>
+                        <div class="input-group">
+                            <span class="input-group-text fw-700">$</span>
+                            <input asp-for="CostUSD" type="number" step="0.01" min="0"
+                                   class="form-control" id="costUsdInput" placeholder="0.00" />
+                        </div>
+                        <span asp-validation-for="CostUSD" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <!-- ZAR Live Preview -->
+                    <div class="zar-preview-box mb-2">
+                        <i class="bi bi-currency-exchange" style="color:#059669;font-size:20px"></i>
+                        <div style="flex:1">
+                            <div class="zar-preview-label">Live ZAR Equivalent</div>
+                            <div class="zar-preview-value" id="costZarDisplay">R 0.00</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-size:11px;color:#065f46;font-weight:600">Exchange Rate</div>
+                            <div style="font-size:13px;color:#047857;font-weight:700;font-family:monospace">
+                                <span id="rateDisplay"></span> ZAR/USD
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text mb-2">
+                        <i class="bi bi-info-circle me-1"></i>
+                        ZAR cost is auto-calculated and saved using the live exchange rate. Falls back to 18.50 if API is unavailable.
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <button type="submit" class="btn-glms-primary">
+                        <i class="bi bi-check-circle"></i>
+                        Save Request
+                    </button>
+                    <a asp-action="Index" class="btn-glms-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="col-lg-5">
+        <div class="glms-card">
+            <div class="card-header">
+                <i class="bi bi-shield-check me-2"></i>
+                Business Rules
             </div>
-        </form>
+            <div class="card-body" style="font-size:13px">
+                <div class="d-flex gap-2 mb-3">
+                    <i class="bi bi-check-circle-fill text-success mt-1" style="flex-shrink:0"></i>
+                    <div><strong>Active contracts</strong> — service requests allowed</div>
+                </div>
+                <div class="d-flex gap-2 mb-3">
+                    <i class="bi bi-check-circle-fill text-success mt-1" style="flex-shrink:0"></i>
+                    <div><strong>Draft contracts</strong> — service requests allowed</div>
+                </div>
+                <div class="d-flex gap-2 mb-3">
+                    <i class="bi bi-x-circle-fill text-danger mt-1" style="flex-shrink:0"></i>
+                    <div><strong>Expired contracts</strong> — service requests blocked</div>
+                </div>
+                <div class="d-flex gap-2">
+                    <i class="bi bi-x-circle-fill text-danger mt-1" style="flex-shrink:0"></i>
+                    <div><strong>OnHold contracts</strong> — service requests blocked</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glms-card mt-3">
+            <div class="card-header">
+                <i class="bi bi-currency-exchange me-2"></i>
+                Currency Info
+            </div>
+            <div class="card-body" style="font-size:13px;color:var(--text-secondary)">
+                The ZAR cost is automatically calculated as you type using the live exchange rate
+                from the Open Exchange Rates API. The rate is refreshed on each page load.
+                If the API is unavailable, a fallback rate of <strong>R 18.50 per USD</strong> is used.
+            </div>
+        </div>
     </div>
 </div>
 
@@ -79,7 +160,7 @@
 
             function recalculate() {
                 const usd = parseFloat(usdInput.value) || 0;
-                zarDisplay.value = (usd * zarRate).toFixed(2);
+                zarDisplay.textContent = 'R ' + (usd * zarRate).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             }
 
             usdInput.addEventListener('input', recalculate);

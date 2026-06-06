@@ -1,56 +1,115 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - GLMS.Web</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] — GLMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/GLMS.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">GLMS.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Clients" asp-action="Index">Clients</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Contracts" asp-action="Index">Contracts</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="ServiceRequests" asp-action="Index">Service Requests</a>
-                        </li>
-                    </ul>
-                </div>
+
+    <!-- ── Sidebar ── -->
+    <aside class="glms-sidebar" id="sidebar">
+        <a class="sidebar-logo" asp-controller="Home" asp-action="Index">
+            <div class="sidebar-logo-icon">
+                <i class="bi bi-globe2 text-white"></i>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+            <div class="sidebar-logo-text">
+                <span class="sidebar-logo-title">GLMS</span>
+                <span class="sidebar-logo-sub">TechMove Logistics</span>
+            </div>
+        </a>
+
+        <div class="sidebar-section-label">Main Menu</div>
+        <ul class="sidebar-nav">
+            <li>
+                <a asp-controller="Home" asp-action="Index"
+                   class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
+                    <i class="bi bi-house-door nav-icon"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Clients" asp-action="Index"
+                   class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Clients" ? "active" : "")">
+                    <i class="bi bi-people nav-icon"></i>
+                    Clients
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Contracts" asp-action="Index"
+                   class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Contracts" ? "active" : "")">
+                    <i class="bi bi-file-earmark-text nav-icon"></i>
+                    Contracts
+                </a>
+            </li>
+            <li>
+                <a asp-controller="ServiceRequests" asp-action="Index"
+                   class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ServiceRequests" ? "active" : "")">
+                    <i class="bi bi-clipboard2-check nav-icon"></i>
+                    Service Requests
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-section-label">Quick Actions</div>
+        <ul class="sidebar-nav">
+            <li>
+                <a asp-controller="Clients" asp-action="Create">
+                    <i class="bi bi-person-plus nav-icon"></i>
+                    New Client
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Contracts" asp-action="Create">
+                    <i class="bi bi-plus-circle nav-icon"></i>
+                    New Contract
+                </a>
+            </li>
+            <li>
+                <a asp-controller="ServiceRequests" asp-action="Create">
+                    <i class="bi bi-send-plus nav-icon"></i>
+                    New Request
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            &copy; 2026 TechMove Logistics
+        </div>
+    </aside>
+
+    <!-- ── Main ── -->
+    <div class="glms-main">
+
+        <!-- Topbar -->
+        <div class="glms-topbar">
+            <button class="btn-glms-outline d-md-none border-0 p-2" id="sidebarToggle" style="min-width:0">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+            <span class="topbar-title">@(ViewData["Title"] ?? "Dashboard")</span>
+        </div>
+
+        <!-- Content -->
+        <div class="glms-content">
             @RenderBody()
-        </main>
+        </div>
+
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - GLMS.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
