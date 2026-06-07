@@ -20,7 +20,7 @@ public class CurrencyService
             HttpResponseMessage response = await _httpClient.GetAsync(ApiUrl);
             response.EnsureSuccessStatusCode();
 
-            string json = await response.Content.ReadAsStringAsync();
+            var json = await response.Content.ReadAsStringAsync();
             using var doc = JsonDocument.Parse(json);
 
             if (doc.RootElement.TryGetProperty("rates", out var rates) &&
