@@ -1,13 +1,14 @@
 using GLMS.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(o =>
+{
+    o.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+});
 
 var apiBase = builder.Configuration["ApiBaseUrl"]
     ?? throw new InvalidOperationException("ApiBaseUrl is not configured.");
 
-Console.WriteLine($"[DIAG] ApiBaseUrl = {apiBase}");
 
 builder.Services.AddHttpClient<GlmsApiClient>(client =>
 {
