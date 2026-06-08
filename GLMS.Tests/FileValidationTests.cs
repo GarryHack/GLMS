@@ -42,4 +42,5 @@ public class FileValidationTests
     {
         Assert.Equal(expectedValid, IsPdf(fileName));
     }
+   
 }

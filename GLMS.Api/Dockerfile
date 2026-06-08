@@ -13,7 +13,8 @@ COPY GLMS.Api/ GLMS.Api/
 RUN dotnet publish GLMS.Api/GLMS.Api.csproj \
     -c Release \
     -o /app/publish \
-    /p:UseAppHost=false
+    /p:UseAppHost=false \
+    /p:ErrorOnDuplicatePublishOutputFiles=false
 
 # ── Stage 2: Runtime image ─────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
